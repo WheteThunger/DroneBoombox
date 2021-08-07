@@ -34,6 +34,14 @@ namespace Oxide.Plugins
         private static readonly Vector3 BoomboxLocalPosition = new Vector3(0, 0.21f, 0.17f);
         private static readonly Quaternion BoomboxLocalRotation = Quaternion.Euler(270, 0, 0);
 
+        // Subscribe to these hooks while there are boombox drones.
+        private DynamicHookSubscriber<uint> _boomboxDroneTracker = new DynamicHookSubscriber<uint>(
+            nameof(OnEntityKill),
+            nameof(OnEntityTakeDamage),
+            nameof(CanPickupEntity),
+            nameof(canRemove)
+        );
+
         #endregion
 
         #region Hooks
@@ -45,6 +53,8 @@ namespace Oxide.Plugins
             permission.RegisterPermission(PermissionDeploy, this);
             permission.RegisterPermission(PermissionDeployFree, this);
             permission.RegisterPermission(PermissionAutoDeploy, this);
+
+            _boomboxDroneTracker.UnsubscribeAll();
         }
 
         private void Unload()
@@ -64,7 +74,7 @@ namespace Oxide.Plugins
                 if (droneBoombox == null)
                     continue;
 
-                SetupDroneBoombox(droneBoombox);
+                SetupDroneBoombox(drone, droneBoombox);
             }
         }
 
@@ -97,6 +107,20 @@ namespace Oxide.Plugins
                     ChatMessage(player, Lang.TipDeployCommand);
                 }
             });
+        }
+
+        private void OnEntityKill(Drone drone)
+        {
+            _boomboxDroneTracker.Remove(drone.net.ID);
+        }
+
+        private void OnEntityKill(DeployableBoomBox boombox)
+        {
+            var drone = GetParentDrone(boombox);
+            if (drone == null)
+                return;
+
+            _boomboxDroneTracker.Remove(drone.net.ID);
         }
 
         // Redirect damage from the boombox to the drone.
@@ -280,10 +304,12 @@ namespace Oxide.Plugins
             entity.ClientRPCPlayer(null, player, "HitNotify");
         }
 
-        private static void SetupDroneBoombox(DeployableBoomBox boombox)
+        private static void SetupDroneBoombox(Drone drone, DeployableBoomBox boombox)
         {
             // Damage will be processed by the drone.
             boombox.baseProtection = null;
+
+            _pluginInstance._boomboxDroneTracker.Add(drone.net.ID);
         }
 
         private static void RunOnEntityBuilt(Item boomboxItem, DeployableBoomBox boombox) =>
@@ -308,9 +334,10 @@ namespace Oxide.Plugins
             if (basePlayer != null)
                 boombox.OwnerID = basePlayer.userID;
 
-            SetupDroneBoombox(boombox);
             boombox.SetParent(drone);
             boombox.Spawn();
+
+            SetupDroneBoombox(drone, boombox);
             drone.SetSlot(BoomboxSlot, boombox);
 
             Effect.server.Run(DeployEffectPrefab, boombox.transform.position);
@@ -340,6 +367,45 @@ namespace Oxide.Plugins
             }
 
             return boombox;
+        }
+
+        #endregion
+
+        #region Dynamic Hook Subscriptions
+
+        private class DynamicHookSubscriber<T>
+        {
+            private HashSet<T> _list = new HashSet<T>();
+            private string[] _hookNames;
+
+            public DynamicHookSubscriber(params string[] hookNames)
+            {
+                _hookNames = hookNames;
+            }
+
+            public void Add(T item)
+            {
+                if (_list.Add(item) && _list.Count == 1)
+                    SubscribeAll();
+            }
+
+            public void Remove(T item)
+            {
+                if (_list.Remove(item) && _list.Count == 0)
+                    UnsubscribeAll();
+            }
+
+            public void SubscribeAll()
+            {
+                foreach (var hookName in _hookNames)
+                    _pluginInstance.Subscribe(hookName);
+            }
+
+            public void UnsubscribeAll()
+            {
+                foreach (var hookName in _hookNames)
+                    _pluginInstance.Unsubscribe(hookName);
+            }
         }
 
         #endregion
