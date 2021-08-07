@@ -74,8 +74,8 @@ Drone attachments:
 - [Drone Lights](https://umod.org/plugins/drone-lights) -- Adds controllable search lights to RC drones.
 - [Drone Turrets](https://umod.org/plugins/drone-turrets) -- Allows players to deploy auto turrets to RC drones.
 - [Drone Storage](https://umod.org/plugins/drone-storage) -- Allows players to deploy a small stash to RC drones.
-- [Ridable Drones](https://umod.org/plugins/ridable-drones) -- Allows players to ride RC drones by standing on them or mounting a chair.
 - [Drone Boombox](https://umod.org/plugins/drone-boombox) (This plugin) -- Allows players to deploy boomboxes to RC drones.
+- [Ridable Drones](https://umod.org/plugins/ridable-drones) -- Allows players to ride RC drones by standing on them or mounting a chair.
 
 ## Developer API
 
