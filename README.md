@@ -5,8 +5,6 @@
 
 ## Permissions
 
-### Deployment permissions
-
 - `droneboombox.deploy` -- Allows the player to deploy a boombox onto a drone using the `droneboombox` command.
 - `droneboombox.deploy.free` -- Allows using the `droneboombox` command for free (no boombox item required).
 - `droneboombox.autodeploy` -- Drones deployed by players with this permission will automatically have a boombox, free of charge.
