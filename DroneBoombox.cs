@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Oxide.Core;
+using Oxide.Core.Plugins;
 using Oxide.Core.Libraries.Covalence;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,9 @@ namespace Oxide.Plugins
     internal class DroneBoombox : CovalencePlugin
     {
         #region Fields
+
+        [PluginReference]
+        private Plugin DroneSettings;
 
         private static DroneBoombox _pluginInstance;
         private Configuration _pluginConfig;
@@ -121,6 +125,7 @@ namespace Oxide.Plugins
                 return;
 
             _boomboxDroneTracker.Remove(drone.net.ID);
+            drone.Invoke(() => RefreshDronSettingsProfile(drone), 0);
         }
 
         // Redirect damage from the boombox to the drone.
@@ -167,6 +172,12 @@ namespace Oxide.Plugins
             }
 
             return null;
+        }
+
+        // This hook is exposed by plugin: Drone Settings (DroneSettings).
+        private string OnDroneTypeDetermine(Drone drone)
+        {
+            return GetDroneBoombox(drone) != null ? Name : null;
         }
 
         #endregion
@@ -304,14 +315,6 @@ namespace Oxide.Plugins
             entity.ClientRPCPlayer(null, player, "HitNotify");
         }
 
-        private static void SetupDroneBoombox(Drone drone, DeployableBoomBox boombox)
-        {
-            // Damage will be processed by the drone.
-            boombox.baseProtection = null;
-
-            _pluginInstance._boomboxDroneTracker.Add(drone.net.ID);
-        }
-
         private static void RunOnEntityBuilt(Item boomboxItem, DeployableBoomBox boombox) =>
             Interface.CallHook("OnEntityBuilt", boomboxItem.GetHeldEntity(), boombox.gameObject);
 
@@ -325,7 +328,25 @@ namespace Oxide.Plugins
             basePlayer.inventory.FindItemID(PortableBoomboxItemId) ??
             basePlayer.inventory.FindItemID(DeployableBoomboxItemId);
 
-        private static DeployableBoomBox DeployBoombox(Drone drone, BasePlayer basePlayer)
+        private void RefreshDronSettingsProfile(Drone drone)
+        {
+            _pluginInstance.DroneSettings?.Call("API_RefreshDroneProfile", drone);
+        }
+
+        private void SetupDroneBoombox(Drone drone, DeployableBoomBox boombox)
+        {
+            // Damage will be processed by the drone.
+            boombox.baseProtection = null;
+
+            // These boomboxes should not decay while playing, since that would damage the drone.
+            // Default is 0.025 for the static boomboxes, even though it's 0 for other deployable boomboxes.
+            boombox.BoxController.ConditionLossRate = 0;
+
+            RefreshDronSettingsProfile(drone);
+            _boomboxDroneTracker.Add(drone.net.ID);
+        }
+
+        private DeployableBoomBox DeployBoombox(Drone drone, BasePlayer basePlayer)
         {
             var boombox = GameManager.server.CreateEntity(BoomboxPrefab, BoomboxLocalPosition, BoomboxLocalRotation) as DeployableBoomBox;
             if (boombox == null)
@@ -337,8 +358,8 @@ namespace Oxide.Plugins
             boombox.SetParent(drone);
             boombox.Spawn();
 
-            SetupDroneBoombox(drone, boombox);
             drone.SetSlot(BoomboxSlot, boombox);
+            SetupDroneBoombox(drone, boombox);
 
             Effect.server.Run(DeployEffectPrefab, boombox.transform.position);
             Interface.CallHook("OnDroneBoomboxDeployed", drone, boombox, basePlayer);
