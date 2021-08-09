@@ -189,6 +189,10 @@ namespace Oxide.Plugins
             if (player.IsServer)
                 return;
 
+            var basePlayer = player.Object as BasePlayer;
+            if (!basePlayer.CanInteract())
+                return;
+
             Drone drone;
             if (!VerifyPermission(player, PermissionDeploy)
                 || !VerifyDroneFound(player, out drone)
@@ -198,7 +202,6 @@ namespace Oxide.Plugins
 
             Item boomboxPaymentItem = null;
 
-            var basePlayer = player.Object as BasePlayer;
             if (!player.HasPermission(PermissionDeployFree))
             {
                 boomboxPaymentItem = FindPlayerBoomboxItem(basePlayer);
