@@ -196,6 +196,7 @@ namespace Oxide.Plugins
             Drone drone;
             if (!VerifyPermission(player, PermissionDeploy)
                 || !VerifyDroneFound(player, out drone)
+                || !VerifyCanBuild(player, drone)
                 || !VerifyDroneHasNoBoombox(player, drone)
                 || !VerifyDroneHasSlotVacant(player, drone))
                 return;
@@ -246,6 +247,16 @@ namespace Oxide.Plugins
                 return true;
 
             ReplyToPlayer(player, Lang.ErrorNoDroneFound);
+            return false;
+        }
+
+        private bool VerifyCanBuild(IPlayer player, Drone drone)
+        {
+            var basePlayer = player.Object as BasePlayer;
+            if (basePlayer.CanBuild() && basePlayer.CanBuild(drone.WorldSpaceBounds()))
+                return true;
+
+            ReplyToPlayer(player, Lang.ErrorBuildingBlocked);
             return false;
         }
 
@@ -578,6 +589,7 @@ namespace Oxide.Plugins
             public const string TipDeployCommand = "Tip.DeployCommand";
             public const string ErrorNoPermission = "Error.NoPermission";
             public const string ErrorNoDroneFound = "Error.NoDroneFound";
+            public const string ErrorBuildingBlocked = "Error.BuildingBlocked";
             public const string ErrorNoBoomboxItem = "Error.NoBoomboxItem";
             public const string ErrorAlreadyHasBoombox = "Error.AlreadyHasBoombox";
             public const string ErrorIncompatibleAttachment = "Error.IncompatibleAttachment";
@@ -592,6 +604,7 @@ namespace Oxide.Plugins
                 [Lang.TipDeployCommand] = "Tip: Look at the drone and run <color=yellow>/droneboombox</color> to deploy a boombox.",
                 [Lang.ErrorNoPermission] = "You don't have permission to do that.",
                 [Lang.ErrorNoDroneFound] = "Error: No drone found.",
+                [Lang.ErrorBuildingBlocked] = "Error: Cannot do that while building blocked.",
                 [Lang.ErrorNoBoomboxItem] = "Error: You need a boombox to do that.",
                 [Lang.ErrorAlreadyHasBoombox] = "Error: That drone already has a boombox.",
                 [Lang.ErrorIncompatibleAttachment] = "Error: That drone has an incompatible attachment.",

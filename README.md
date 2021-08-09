@@ -34,6 +34,7 @@ Default configuration:
   "Tip.DeployCommand": "Tip: Look at the drone and run <color=yellow>/droneboombox</color> to deploy a boombox.",
   "Error.NoPermission": "You don't have permission to do that.",
   "Error.NoDroneFound": "Error: No drone found.",
+  "Error.BuildingBlocked": "Error: Cannot do that while building blocked.",
   "Error.NoBoomboxItem": "Error: You need a boombox to do that.",
   "Error.AlreadyHasBoombox": "Error: That drone already has a boombox.",
   "Error.IncompatibleAttachment": "Error: That drone has an incompatible attachment.",
