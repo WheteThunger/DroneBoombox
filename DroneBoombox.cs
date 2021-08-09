@@ -143,35 +143,20 @@ namespace Oxide.Plugins
 
         private bool? CanPickupEntity(BasePlayer player, Drone drone)
         {
-            return CanPickupInternal(player, drone, provideFeedback: true);
+            if (CanPickupInternal(player, drone))
+                return null;
+
+            ChatMessage(player, Lang.ErrorCannotPickupWithCassette);
+            return false;
         }
 
         // This hook is exposed by plugin: Remover Tool (RemoverTool).
-        private bool? canRemove(BasePlayer player, Drone drone)
+        private string canRemove(BasePlayer player, Drone drone)
         {
-            return CanPickupInternal(player, drone, provideFeedback: false);
-        }
-
-        // Not a hook.
-        private bool? CanPickupInternal(BasePlayer player, Drone drone, bool provideFeedback = false)
-        {
-            if (!IsDroneEligible(drone))
+            if (CanPickupInternal(player, drone))
                 return null;
 
-            var boombox = GetDroneBoombox(drone);
-            if (boombox == null)
-                return null;
-
-            // Prevent drone pickup while it has a boombox with a cassette in it (the cassette must be removed first).
-            if (boombox != null && !boombox.inventory.IsEmpty() && !boombox.inventory.IsLocked())
-            {
-                if (provideFeedback)
-                    ChatMessage(player, Lang.ErrorContainsCassette);
-
-                return false;
-            }
-
-            return null;
+            return GetMessage(player, Lang.ErrorCannotPickupWithCassette);
         }
 
         // This hook is exposed by plugin: Drone Settings (DroneSettings).
@@ -305,6 +290,22 @@ namespace Oxide.Plugins
 
         private static DeployableBoomBox GetDroneBoombox(Drone drone) =>
             drone.GetSlot(BoomboxSlot) as DeployableBoomBox;
+
+        private static bool CanPickupInternal(BasePlayer player, Drone drone)
+        {
+            if (!IsDroneEligible(drone))
+                return true;
+
+            var boombox = GetDroneBoombox(drone);
+            if (boombox == null)
+                return true;
+
+            // Prevent drone pickup while it has a boombox with a cassette in it (the cassette must be removed first).
+            if (boombox != null && !boombox.inventory.IsEmpty() && !boombox.inventory.IsLocked())
+                return false;
+
+            return true;
+        }
 
         private static void HitNotify(BaseEntity entity, HitInfo info)
         {
@@ -560,6 +561,9 @@ namespace Oxide.Plugins
         private string GetMessage(IPlayer player, string messageName, params object[] args) =>
             GetMessage(player.Id, messageName, args);
 
+        private string GetMessage(BasePlayer player, string messageName, params object[] args) =>
+            GetMessage(player.UserIDString, messageName, args);
+
         private string GetMessage(string playerId, string messageName, params object[] args)
         {
             var message = lang.GetMessage(messageName, this, playerId);
@@ -575,7 +579,7 @@ namespace Oxide.Plugins
             public const string ErrorAlreadyHasBoombox = "Error.AlreadyHasBoombox";
             public const string ErrorIncompatibleAttachment = "Error.IncompatibleAttachment";
             public const string ErrorDeployFailed = "Error.DeployFailed";
-            public const string ErrorContainsCassette = "Error.ContainsCassette";
+            public const string ErrorCannotPickupWithCassette = "Error.CannotPickupWithCassette";
         }
 
         protected override void LoadDefaultMessages()
@@ -589,7 +593,7 @@ namespace Oxide.Plugins
                 [Lang.ErrorAlreadyHasBoombox] = "Error: That drone already has a boombox.",
                 [Lang.ErrorIncompatibleAttachment] = "Error: That drone has an incompatible attachment.",
                 [Lang.ErrorDeployFailed] = "Error: Failed to deploy boombox.",
-                [Lang.ErrorContainsCassette] = "Error: Cannot pick up that drone while its boombox contains a cassette.",
+                [Lang.ErrorCannotPickupWithCassette] = "Cannot pick up that drone while its boombox contains a cassette.",
             }, this, "en");
         }
 

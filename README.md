@@ -38,7 +38,7 @@ Default configuration:
   "Error.AlreadyHasBoombox": "Error: That drone already has a boombox.",
   "Error.IncompatibleAttachment": "Error: That drone has an incompatible attachment.",
   "Error.DeployFailed": "Error: Failed to deploy boombox.",
-  "Error.ContainsCassette": "Error: Cannot pick up that drone while its boombox contains a cassette."
+  "Error.CannotPickupWithCassette": "Cannot pick up that drone while its boombox contains a cassette."
 }
 ```
 
