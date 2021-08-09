@@ -125,7 +125,7 @@ namespace Oxide.Plugins
                 return;
 
             _boomboxDroneTracker.Remove(drone.net.ID);
-            drone.Invoke(() => RefreshDronSettingsProfile(drone), 0);
+            drone.Invoke(() => RefreshDroneSettingsProfile(drone), 0);
         }
 
         // Redirect damage from the boombox to the drone.
@@ -343,7 +343,7 @@ namespace Oxide.Plugins
             basePlayer.inventory.FindItemID(PortableBoomboxItemId) ??
             basePlayer.inventory.FindItemID(DeployableBoomboxItemId);
 
-        private void RefreshDronSettingsProfile(Drone drone)
+        private void RefreshDroneSettingsProfile(Drone drone)
         {
             _pluginInstance.DroneSettings?.Call("API_RefreshDroneProfile", drone);
         }
@@ -357,7 +357,7 @@ namespace Oxide.Plugins
             // Default is 0.025 for the static boomboxes, even though it's 0 for other deployable boomboxes.
             boombox.BoxController.ConditionLossRate = 0;
 
-            RefreshDronSettingsProfile(drone);
+            RefreshDroneSettingsProfile(drone);
             _boomboxDroneTracker.Add(drone.net.ID);
         }
 
