@@ -8,7 +8,6 @@
 - `droneboombox.deploy` -- Allows the player to deploy a boombox onto a drone using the `droneboombox` command.
 - `droneboombox.deploy.free` -- Allows using the `droneboombox` command for free (no boombox item required).
 - `droneboombox.autodeploy` -- Drones deployed by players with this permission will automatically have a boombox, free of charge.
-  - Note: Reloading the plugin will automatically add boomboxes to existing drones owned by players with this permission.
   - Not recommended if you want to allow players to deploy other attachments such as auto turrets since they are incompatible.
 
 ## Commands
