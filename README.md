@@ -3,6 +3,10 @@
 - Allows players with permission to deploy boomboxes onto RC drones
 - Redirects damage from the boombox to the drone
 
+## Known issues
+
+Since the March 2023 Rust update, drones now sway in the wind, but attached entities do not sway. This causes undesirable visuals to players observing a drone that is being controlled. There is no known fix at this time.
+
 ## Permissions
 
 - `droneboombox.deploy` -- Allows the player to deploy a boombox onto a drone using the `droneboombox` command.
