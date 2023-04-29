@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Drone Boombox", "WhiteThunder", "1.0.0")]
+    [Info("Drone Boombox", "WhiteThunder", "1.0.1")]
     [Description("Allows players to deploy boomboxes onto RC drones.")]
     internal class DroneBoombox : CovalencePlugin
     {
@@ -39,7 +39,7 @@ namespace Oxide.Plugins
         private static readonly Quaternion BoomboxLocalRotation = Quaternion.Euler(270, 0, 0);
 
         // Subscribe to these hooks while there are boombox drones.
-        private DynamicHookSubscriber<uint> _boomboxDroneTracker = new DynamicHookSubscriber<uint>(
+        private DynamicHookSubscriber<NetworkableId> _boomboxDroneTracker = new DynamicHookSubscriber<NetworkableId>(
             nameof(OnEntityKill),
             nameof(OnEntityTakeDamage),
             nameof(CanPickupEntity),
