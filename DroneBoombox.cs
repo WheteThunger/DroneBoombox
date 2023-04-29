@@ -289,7 +289,7 @@ namespace Oxide.Plugins
         }
 
         private static bool IsDroneEligible(Drone drone) =>
-            !(drone is DeliveryDrone);
+            drone.skinID == 0 && !(drone is DeliveryDrone);
 
         private static BaseEntity GetLookEntity(BasePlayer basePlayer, float maxDistance = 3)
         {
