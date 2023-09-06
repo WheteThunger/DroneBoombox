@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Drone Boombox", "WhiteThunder", "1.0.1")]
+    [Info("Drone Boombox", "WhiteThunder", "1.0.2")]
     [Description("Allows players to deploy boomboxes onto RC drones.")]
     internal class DroneBoombox : CovalencePlugin
     {
@@ -340,8 +340,8 @@ namespace Oxide.Plugins
         }
 
         private static Item FindPlayerBoomboxItem(BasePlayer basePlayer) =>
-            basePlayer.inventory.FindItemID(PortableBoomboxItemId) ??
-            basePlayer.inventory.FindItemID(DeployableBoomboxItemId);
+            basePlayer.inventory.FindItemByItemID(PortableBoomboxItemId) ??
+            basePlayer.inventory.FindItemByItemID(DeployableBoomboxItemId);
 
         private void RefreshDroneSettingsProfile(Drone drone)
         {
