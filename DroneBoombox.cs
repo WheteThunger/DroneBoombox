@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("Drone Boombox", "WhiteThunder", "1.0.2")]
+    [Info("Drone Boombox", "WhiteThunder", "1.0.3")]
     [Description("Allows players to deploy boomboxes onto RC drones.")]
     internal class DroneBoombox : CovalencePlugin
     {
@@ -136,8 +136,6 @@ namespace Oxide.Plugins
                 return null;
 
             drone.Hurt(info);
-            HitNotify(drone, info);
-
             return true;
         }
 
@@ -319,15 +317,6 @@ namespace Oxide.Plugins
                 return false;
 
             return true;
-        }
-
-        private static void HitNotify(BaseEntity entity, HitInfo info)
-        {
-            var player = info.Initiator as BasePlayer;
-            if (player == null)
-                return;
-
-            entity.ClientRPCPlayer(null, player, "HitNotify");
         }
 
         private static void RunOnEntityBuilt(Item boomboxItem, DeployableBoomBox boombox) =>
